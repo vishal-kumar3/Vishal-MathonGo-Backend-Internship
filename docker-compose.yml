@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/mathongo
+      - REDIS_URL=redis://redis:6379
+      - ADMIN_SECRET=your_admin_secret_key
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./uploads:/app/uploads
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27018:27017"  # Use different external port
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=mathongo
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"  # Use different external port
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mongo_data:
+  redis_data:
