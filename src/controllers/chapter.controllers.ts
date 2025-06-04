@@ -101,8 +101,7 @@ export const uploadChapters = asyncHandler(async (req: Request, res: Response) =
       throw new ApiError(STATUS_CODE.BAD_REQUEST, 'Invalid JSON file format');
     }
   } else {
-    const validatedBody = zodValidator(uploadChaptersBodySchema, req.body);
-    const { chapters } = validatedBody;
+    const { chapters } = req.body;
 
     if (!chapters) {
       throw new ApiError(STATUS_CODE.BAD_REQUEST, 'No chapters data provided');
@@ -122,21 +121,24 @@ export const uploadChapters = asyncHandler(async (req: Request, res: Response) =
     const chapterData = chaptersData[i];
 
     try {
+      // Validate chapter data against schema
       const validatedData = zodValidator(chapterValidationSchema, chapterData);
 
+      // Create and save the chapter
       const chapter = new Chapter(validatedData);
       const savedChapter = await chapter.save();
       successfulChapters.push(savedChapter);
-
-    } catch (validationError) {
+    } catch (error) {
+    // Add failed chapters to the failed array and continue processing
       failedChapters.push({
         index: i,
         data: chapterData,
-        error: validationError instanceof Error ? validationError.message : 'Validation failed'
+        error: error instanceof Error ? error.message : 'Processing failed'
       });
     }
   }
 
+  // Clear cache only if at least one chapter was successfully added
   if (successfulChapters.length > 0) {
     await deleteCachedData('chapters:*');
   }

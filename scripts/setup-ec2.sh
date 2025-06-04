@@ -29,7 +29,7 @@ sudo chown ubuntu:ubuntu /home/ubuntu/mathongo
 
 # Clone repository (replace with your repo URL)
 cd /home/ubuntu
-git clone https://github.com/yourusername/mathongo.git
+git clone https://github.com/vishal-kumar3/mathongo.git
 cd mathongo
 
 # Copy environment file
